@@ -8,26 +8,38 @@ var ToDoLists: IList[] = [];
 @Injectable()
 export class ListsService {
 
-  create(createListDto: CreateListDto) {
+  public create(createListDto: CreateListDto) {
     ToDoLists.push(createListDto);
     console.log(createListDto);
     console.log(ToDoLists);
     return 'This action adds a new list';
   }
 
-  findAll() {
+  public findAll() {
     return ToDoLists;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} list`;
+  public findOne(id: number) {
+    return ToDoLists.find(x => x.id === id);
   }
 
-  update(id: number, updateListDto: UpdateListDto) {
-    return `This action updates a #${id} list`;
+  public update(id: number, updateListDto: UpdateListDto): boolean {
+    let listToBeUpdatedIndex = ToDoLists.findIndex(x => x.id === id)
+    if (listToBeUpdatedIndex !== -1) {
+      ToDoLists[listToBeUpdatedIndex].name = updateListDto.name;
+      return true;
+    }
+    return false;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} list`;
+  public remove(id: number): boolean {
+    let listToBeRemoved = ToDoLists.findIndex(x => x.id === id);
+    if(listToBeRemoved !== -1) {
+      ToDoLists.splice(listToBeRemoved,1);
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 }
