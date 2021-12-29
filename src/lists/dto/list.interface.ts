@@ -1,4 +1,8 @@
-export interface IList{
+import { Item } from "src/items/dto/item.interface";
+
+export interface List{
     readonly id: number,
-    name: string
+    ownerId: number
+    name: string,
+    items: Item[]
 }

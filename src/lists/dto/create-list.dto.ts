@@ -1,4 +1,6 @@
+import { Item } from "src/items/dto/item.interface";
+
 export class CreateListDto {
-    readonly id: number
-    readonly name: string
+    name: string;
+    items: Item[] = [];
 }

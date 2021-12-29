@@ -1,45 +1,49 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { Repository } from 'typeorm';
 import { CreateListDto } from './dto/create-list.dto';
-import { IList } from './dto/list.interface';
 import { UpdateListDto } from './dto/update-list.dto';
-
-var ToDoLists: IList[] = [];
+import { List } from './entities/list.entity';
 
 @Injectable()
 export class ListsService {
 
-  public create(createListDto: CreateListDto) {
-    ToDoLists.push(createListDto);
-    console.log(createListDto);
-    console.log(ToDoLists);
-    return 'This action adds a new list';
+  constructor(
+    @InjectRepository(List)
+    private readonly listRepository: Repository<List>
+  ) {}
+
+  async create(createListDto: CreateListDto) {
+    const list = new List();
+    const user = new User();
+    user.id = 2;
+    user.isActive = true;
+    user.firstName = 'Kuba';
+    user.lastName = 'Jelonek';
+    user.lists = [];
+    list.name = createListDto.name;
+    list.user = user;
+    return await this.listRepository.save(list);
   }
 
-  public findAll() {
-    return ToDoLists;
+  async findAll() {
+    return await this.listRepository.find();
   }
 
-  public findOne(id: number) {
-    return ToDoLists.find(x => x.id === id);
+  async findAllByUserId(userId: number) {
+    return await this.listRepository.find({where: {user:userId}});
   }
 
-  public update(id: number, updateListDto: UpdateListDto): boolean {
-    let listToBeUpdatedIndex = ToDoLists.findIndex(x => x.id === id)
-    if (listToBeUpdatedIndex !== -1) {
-      ToDoLists[listToBeUpdatedIndex].name = updateListDto.name;
-      return true;
-    }
-    return false;
+  async findOne(id: number) {
+    return await this.listRepository.findOne({where: {id:id}});
   }
 
-  public remove(id: number): boolean {
-    let listToBeRemoved = ToDoLists.findIndex(x => x.id === id);
-    if(listToBeRemoved !== -1) {
-      ToDoLists.splice(listToBeRemoved,1);
-      return true;
-    }
-    else {
-      return false;
-    }
+  async patch(id: number, updateListDto: UpdateListDto) {
+    await this.listRepository.update({id},updateListDto);
+  }
+
+  async remove(id: number) {
+    await this.listRepository.delete(id);
   }
 }
